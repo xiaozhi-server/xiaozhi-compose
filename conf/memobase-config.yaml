@@ -12,7 +12,7 @@ use_timezone: "Asia/Shanghai"
 # LLM Configuration
 language: "zh"
 llm_style: "openai"
-llm_base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+llm_base_url: "http://aiproxy:17000/default/openai/v1"
 llm_api_key: "example"
 best_llm_model: "qwen2.5-72b-instruct"
 summary_llm_model: null
