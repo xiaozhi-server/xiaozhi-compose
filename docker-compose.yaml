@@ -1,0 +1,91 @@
+services:
+  memobase-server-db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    container_name: memobase-server-db
+    environment:
+      - POSTGRES_USER=example
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=example
+    ports:
+      - '15432:5432'
+    networks:
+      - xiaozhi-network
+    volumes:
+      - ./pgvector_data:/var/lib/postgresql/data
+      # - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U example -d example"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  memobase-server-redis:
+    image: redis:7.4
+    restart: unless-stopped
+    container_name: memobase-server-redis
+    networks:
+      - xiaozhi-network
+    ports:
+      - "16379:6379"
+    volumes:
+      - ./redis_data:/data
+    command: ["redis-server", "--requirepass", "example"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  memobase-server-api:
+    image: ghcr.io/memodb-io/memobase:main
+    container_name: memobase-server-api
+    environment:
+      - DATABASE_URL=postgresql://example:example@memobase-server-db:5432/example
+      - REDIS_URL=redis://:example@memobase-server-redis:6379/0
+      - ACCESS_TOKEN=example
+      - PROJECT_ID=example
+      - API_EXPORT_PORT="8019"
+      - API_HOSTS="http://0.0.0.0:8019"
+      - USE_CORS=false
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+    networks:
+      - xiaozhi-network
+    depends_on:
+      memobase-server-db:
+        condition: service_healthy
+      memobase-server-redis:
+        condition: service_healthy
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./conf/memobase-config.yaml:/app/config.yaml
+  navidrome:
+    image: deluan/navidrome:0.58.0
+    container_name: navidrome
+    restart: always
+    networks:
+      - xiaozhi-network
+    ports:
+      - "4533:4533"
+    volumes:
+      - ./navidrome_data:/data:rw
+      - ./music:/music:ro
+    environment:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info
+      ND_SESSIONTIMEOUT: 24h
+      ND_BASEURL: ""
+    labels:
+      createdBy: "Apps"
+volumes:
+  memobase-server-db:
+    driver: local
+  memobase-server-redis:
+    driver: local
+  memobase-server-api:
+    driver: local
+  navidrome:
+    driver: local
+networks:
+  xiaozhi-network:
+    driver: bridge
