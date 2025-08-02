@@ -29,4 +29,6 @@ best_llm_model: "qwen2.5-72b-instruct"
 ```
 
 # 启动服务
-
+```bash
+bash service.sh restart
+```
