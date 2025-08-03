@@ -1,4 +1,26 @@
 services:
+  xiaozhi-backend-go-server:
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server
+    container_name: xiaozhi-backend-go-server
+    network_mode:  host
+    restart:  always
+    env_file:
+      - .env
+    depends_on:
+      - memobase-server-api
+      - aiproxy
+  xiaozhi-web-client:
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:web-client
+    container_name: xiaozhi-web-client
+    network_mode: host
+    expose:
+      - "5001/tcp"
+    env_file:
+      - .env
+    environment:
+      - WS_URL=${WS_URL}
+      - DEVICE_TOKEN=${DEVICE_TOKEN}
+    restart: always
   memobase-server-db:
     image: pgvector/pgvector:pg17
     restart: unless-stopped
@@ -42,6 +64,7 @@ services:
   memobase-server-api:
     image: ghcr.io/memodb-io/memobase:main
     container_name: memobase-server-api
+    restart: always
     env_file:
       - .env
     environment:
@@ -85,16 +108,6 @@ services:
       - ND_BASEURL=
     labels:
       createdBy: "Apps"
-  xiaozhi-web-client:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:web-client
-    container_name: xiaozhi-web-client
-    network_mode: host
-    env_file:
-      - .env
-    environment:
-      - WS_URL=${WS_URL}
-      - DEVICE_TOKEN=${DEVICE_TOKEN}
-    restart: always
   aiproxy:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:aiproxy
     container_name: aiproxy

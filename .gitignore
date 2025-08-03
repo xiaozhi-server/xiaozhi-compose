@@ -33,4 +33,5 @@ go.work.sum
 
 pgvector_data
 redis_data
-navidrome_data
+navidrome_data/*
+music/*

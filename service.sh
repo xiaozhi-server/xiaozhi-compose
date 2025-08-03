@@ -30,6 +30,18 @@ function logs() {
   echo "Logs..."
 }
 
+function stopXiaozhi() {
+  # 停止 docker-compose
+  docker stop xiaozhi-backend-go-server
+  echo "Stopping xiaozhi-backend-go-server..."
+}
+
+function startXiaozhi() {
+  # 启动 docker-compose
+  docker start xiaozhi-backend-go-server
+  echo "Starting xiaozhi-backend-go-server..."
+}
+
 function help() {
   echo "Usage: $0 {start|stop|restart|status|logs}"
   echo "start    - Start the service"
@@ -37,6 +49,8 @@ function help() {
   echo "restart  - Restart the service"
   echo "status   - Check the service status"
   echo "logs     - View the service logs"
+  echo "stopXiaozhi - Stop the xiaozhi-backend-go-server service"
+  echo "startXiaozhi - Start the xiaozhi-backend-go-server service"
 }
 
 case $1 in
@@ -54,6 +68,12 @@ case $1 in
     ;;
   logs)
     logs
+    ;;
+  stopXiaozhi)
+    stopXiaozhi
+    ;;
+  startXiaozhi)
+    startXiaozhi
     ;;
   *)
     help
