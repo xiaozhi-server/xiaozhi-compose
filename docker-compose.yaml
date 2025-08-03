@@ -62,7 +62,8 @@ services:
       timeout: 5s
       retries: 5
   memobase-server-api:
-    image: ghcr.io/memodb-io/memobase:main
+#    image: ghcr.io/memodb-io/memobase:main
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:memobase
     container_name: memobase-server-api
     restart: always
     env_file:
