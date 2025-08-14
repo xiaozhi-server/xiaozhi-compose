@@ -5,7 +5,7 @@ services:
     network_mode:  host
     restart:  always
     volumes:
-      - ./conf/xiaozhi-config.yaml:/workspace/config/config.yaml
+      - ./conf/xiaozhi-config.json:/workspace/config/config.json
     env_file:
       - .env
     depends_on:
