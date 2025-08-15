@@ -17,7 +17,7 @@ services:
     container_name: xiaozhi-esp32-server-web
     restart: always
     networks:
-      - default
+      - xiaozhi-network
     platform: linux/amd64
     depends_on:
       xiaozhi-server-db:
