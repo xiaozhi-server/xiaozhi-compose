@@ -84,7 +84,7 @@ services:
       retries: 10
     restart: always
     networks:
-      - default
+      - xiaozhi-network
     platform: linux/amd64
     expose:
       - 3306
