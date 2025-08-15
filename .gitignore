@@ -35,3 +35,4 @@ pgvector_data
 redis_data
 navidrome_data/*
 music/*
+uploadfile/

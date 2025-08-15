@@ -11,6 +11,33 @@ services:
     depends_on:
       - memobase-server-api
       - aiproxy
+  # manager-api和manager-web模块
+  xiaozhi-esp32-server-web:
+    image: ghcr.nju.edu.cn/xinnan-tech/xiaozhi-esp32-server:web_latest
+    container_name: xiaozhi-esp32-server-web
+    restart: always
+    networks:
+      - default
+    platform: linux/amd64
+    depends_on:
+      xiaozhi-server-db:
+        condition: service_healthy
+      xiaozhi-server-redis:
+        condition: service_healthy
+    ports:
+      # 智控台
+      - "8002:8002"
+    environment:
+      - TZ=Asia/Shanghai
+      - SPRING_DATASOURCE_DRUID_URL=jdbc:mysql://xiaozhi-server-db:3306/xiaozhi_server?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&connectTimeout=30000&socketTimeout=30000&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+      - SPRING_DATASOURCE_DRUID_USERNAME=root
+      - SPRING_DATASOURCE_DRUID_PASSWORD=123456
+      - SPRING_DATA_REDIS_HOST=xiaozhi-server-redis
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_DATA_REDIS_PORT=6379
+    volumes:
+      # 配置文件目录
+      - ./uploadfile:/uploadfile
   xiaozhi-web-client:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:web-client
     container_name: xiaozhi-web-client
@@ -33,6 +60,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+    platform: linux/amd64
     ports:
       - '15432:5432'
     networks:
@@ -45,16 +73,39 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  memobase-server-redis:
+  # 数据库模块
+  xiaozhi-server-db:
+    image: mysql:latest
+    container_name: xiaozhi-server-db
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    networks:
+      - default
+    platform: linux/amd64
+    expose:
+      - 3306
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=xiaozhi_esp32_server
+      - MYSQL_INITDB_ARGS="--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+  xiaozhi-server-redis:
     image: redis:7.4
     restart: unless-stopped
-    container_name: memobase-server-redis
+    container_name: xiaozhi-server-redis
     env_file:
       - .env
     networks:
       - xiaozhi-network
+    platform: linux/amd64
     ports:
-      - "6379:6379"
+      - "16379:6379"
     volumes:
       - ./redis_data:/data
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
@@ -85,7 +136,7 @@ services:
     depends_on:
       memobase-server-db:
         condition: service_healthy
-      memobase-server-redis:
+      xiaozhi-server-redis:
         condition: service_healthy
     ports:
       - '8000:8000'
@@ -124,15 +175,6 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL}
     restart: always
-volumes:
-  memobase-server-db:
-    driver: local
-  memobase-server-redis:
-    driver: local
-  memobase-server-api:
-    driver: local
-  navidrome:
-    driver: local
 networks:
   xiaozhi-network:
     driver: bridge

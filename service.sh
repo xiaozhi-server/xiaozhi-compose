@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
 function start() {
   # 启动 docker-compose
   docker-compose up -d
