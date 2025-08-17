@@ -36,3 +36,4 @@ redis_data
 navidrome_data/*
 music/*
 uploadfile/
+mysql/

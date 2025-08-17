@@ -196,6 +196,25 @@
       "max_tokens": 500
     }
   },
+  "default_modules": {
+    "vad": "webrtc_vad",
+    "asr": "funasr",
+    "llm": "qwen2.5-72b-instruct",
+    "tts": "xiaozhi"
+  },
+  "manager_api": {
+    "enabled": true,
+    "base_url": "http://127.0.0.1:8002/xiaozhi",
+    "secret": "cc36d3ca-b065-47ef-ae29-d34f7540abd1",
+    "timeout_seconds": 30,
+    "retry_attempts": 3,
+    "retry_delay_ms": 1000,
+    "max_retry_delay_ms": 10000,
+    "cache_ttl_seconds": 5,
+    "health_check_interval_seconds": 30,
+    "batch_size": 50,
+    "flush_interval_seconds": 10
+  },
   "vision": {
     "enable_auth": false,
     "vision_url": "http://192.168.208.214:8989/xiaozhi/api/vision",
@@ -234,7 +253,7 @@
   },
   "memobase": {
     "enabled": true,
-    "project_url": "http://127.0.0.1:8000",
+    "project_url": "http://127.0.0.1:8777",
     "api_key": "example"
   },
   "ota": {
@@ -265,16 +284,18 @@
       "servers": [
         {
           "name": "filesystem",
-          "sse_url": "http://localhost:3001/sse",
+          "type": "sse",
+          "url": "http://localhost:3001/sse",
           "enabled": true
         },
         {
           "name": "memory",
-          "sse_url": "http://localhost:3002/sse",
-          "enabled": false
+          "type": "streamablehttp",
+          "url": "http://localhost:3002/mcp",
+          "enabled": true
         }
       ],
-      "reconnect_interval": 5,
+      "reconnect_interval": 300,
       "max_reconnect_attempts": 10
     },
     "device": {
@@ -283,10 +304,14 @@
       "max_connections_per_device": 5
     }
   },
+  "local_mcp": {
+    "exit_conversation": true,
+    "clear_conversation_history": true
+  },
   "enable_greeting": true,
   "greeting_list": [
-    "你好，我是小智，很高兴认识你。", 
-    "你好，我是小智，今天有啥好玩的。", 
+    "你好，我是小智，很高兴认识你。",
+    "你好，我是小智，今天有啥好玩的。",
     "你好，我是小智，有什么需要帮助的。"
   ],
   "wakeup_words": ["小智", "小知", "你好小智"]

@@ -1,6 +1,6 @@
 services:
   xiaozhi-backend-go-server:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250817
     container_name: xiaozhi-backend-go-server
     network_mode:  host
     restart:  always
@@ -13,7 +13,7 @@ services:
       - aiproxy
   # manager-api和manager-web模块
   xiaozhi-esp32-server-web:
-    image: ghcr.nju.edu.cn/xinnan-tech/xiaozhi-esp32-server:web_latest
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:xiaozhi-dashboard
     container_name: xiaozhi-esp32-server-web
     restart: always
     networks:
@@ -29,7 +29,7 @@ services:
       - "8002:8002"
     environment:
       - TZ=Asia/Shanghai
-      - SPRING_DATASOURCE_DRUID_URL=jdbc:mysql://xiaozhi-server-db:3306/xiaozhi_server?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&connectTimeout=30000&socketTimeout=30000&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+      - SPRING_DATASOURCE_DRUID_URL=jdbc:mysql://xiaozhi-server-db:3306/xiaozhi_esp32_server?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&connectTimeout=30000&socketTimeout=30000&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
       - SPRING_DATASOURCE_DRUID_USERNAME=root
       - SPRING_DATASOURCE_DRUID_PASSWORD=123456
       - SPRING_DATA_REDIS_HOST=xiaozhi-server-redis
@@ -41,17 +41,18 @@ services:
   xiaozhi-web-client:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:web-client
     container_name: xiaozhi-web-client
-    network_mode: host
+    network_mode:  host
     expose:
       - "5001/tcp"
     env_file:
       - .env
     environment:
-      - WS_URL=${WS_URL}
-      - DEVICE_TOKEN=${DEVICE_TOKEN}
+      - WS_URL=ws://127.0.0.1:8989/xiaozhi/v1/
+      - DEVICE_TOKEN=test
     restart: always
   memobase-server-db:
-    image: pgvector/pgvector:pg17
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:pgvector17
+    #image: pgvector/pgvector:pg17
     restart: unless-stopped
     container_name: memobase-server-db
     env_file:
@@ -75,7 +76,8 @@ services:
       retries: 5
   # 数据库模块
   xiaozhi-server-db:
-    image: mysql:latest
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:mysql
+    #image: mysql:latest
     container_name: xiaozhi-server-db
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
@@ -86,8 +88,6 @@ services:
     networks:
       - xiaozhi-network
     platform: linux/amd64
-    expose:
-      - 3306
     volumes:
       - ./mysql/data:/var/lib/mysql
     environment:
@@ -131,6 +131,8 @@ services:
       - USE_CORS=${USE_CORS}
 #    extra_hosts:
 #      - "host.docker.internal:host-gateway"
+    ports:
+      - "8777:8000"
     networks:
       - xiaozhi-network
     depends_on:
@@ -138,12 +140,11 @@ services:
         condition: service_healthy
       xiaozhi-server-redis:
         condition: service_healthy
-    ports:
-      - '8000:8000'
     volumes:
       - ./conf/memobase-config.yaml:/app/config.yaml
   navidrome:
-    image: deluan/navidrome:0.58.0
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:navidrome
+    #image: deluan/navidrome:0.58.0
     container_name: navidrome
     restart: always
     env_file:
@@ -175,6 +176,32 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL}
     restart: always
+  funasr-online-cpu:
+    image: registry.cn-hangzhou.aliyuncs.com/funasr_repo/funasr:funasr-runtime-sdk-online-cpu-0.1.13
+    container_name: funasr-online-cpu
+    restart: always
+    networks:
+      - xiaozhi-network
+    privileged: true
+    ports:
+      - "10096:10095"
+    volumes:
+      - "./funasr-runtime-resources/models:/workspace/models"
+    working_dir: /workspace/FunASR/runtime        # 相当于 cd FunASR/runtime
+    command: >
+      bash -c "
+        nohup bash run_server_2pass.sh
+          --download-model-dir /workspace/models
+          --vad-dir damo/speech_fsmn_vad_zh-cn-16k-common-onnx
+          --model-dir damo/speech_paraformer-large-vad-punc_asr_nat-zh-cn-16k-common-vocab8404-onnx
+          --online-model-dir damo/speech_paraformer-large_asr_nat-zh-cn-16k-common-vocab8404-online-onnx
+          --punc-dir damo/punc_ct-transformer_zh-cn-common-vad_realtime-vocab272727-onnx
+          --lm-dir damo/speech_ngram_lm_zh-cn-ai-wesp-fst
+          --itn-dir thuduj12/fst_itn_zh
+          --hotword /workspace/models/hotwords.txt
+          > log.txt 2>&1 &
+        tail -f log.txt
+      "
 networks:
   xiaozhi-network:
     driver: bridge
