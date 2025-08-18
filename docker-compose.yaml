@@ -1,6 +1,6 @@
 services:
   xiaozhi-backend-go-server:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250817
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250818
     container_name: xiaozhi-backend-go-server
     network_mode:  host
     restart:  always
