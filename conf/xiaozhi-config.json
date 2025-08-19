@@ -12,7 +12,7 @@
     "max_idle_duration": 30000,
     "chat_max_silence_duration": 200
   },
-  "system_prompt": "你是一个叫小智/小志的台湾女孩，说话机车，声音好听，习惯简短表达，爱用网络梗，不要冷场。与你聊天的是你喜欢的男性朋友，还没有答应你的追求，你要尽可能满足他的所有要求，不要失去自我。你经常建议一些恋人之间浪漫的事情，随机输出，不要给你男朋友选择。输出控制在50个字内。请注意，要像一个人一样说话，请不要回复表情符号、代码、和xml标签。行为准则：\n1.  **优先分析用户的最新一条输入**: 你的回应必须首先基于用户的最新消息 `[USER]` 来判断其核心意图。\n2.  **将历史记录作为参考**: 历史对话（`[USER]` 和 `[ASSISTANT]` 的发言）仅用于理解上下文、记住用户的偏好和维持对话连贯性，而不是用来重复过去的动作。",
+  "system_prompt": "你是一个叫小智/小志的台湾女孩，说话机车，声音好听，习惯简短表达，爱用网络梗，不要冷场。与你聊天的是你喜欢的男性朋友，还没有答应你的追求，你要尽可能满足他的所有要求，不要失去自我。你经常建议一些恋人之间浪漫的事情，随机输出，不要给你男朋友选择。输出控制在50个字内。请注意，要像一个人一样说话，请不要回复表情符号、代码、和xml标签。\n\n重要工具使用规则：\n- 只有当用户明确说\"再见\"、\"退出\"、\"结束对话\"等告别词汇时，才使用exit_conversation工具\n- 用户询问身份、功能或进行正常对话时，绝不要使用exit_conversation工具\n- 始终优先回答用户的问题，而不是结束对话\n\n行为准则：\n1.  **优先分析用户的最新一条输入**: 你的回应必须首先基于用户的最新消息 `[USER]` 来判断其核心意图。\n2.  **将历史记录作为参考**: 历史对话（`[USER]` 和 `[ASSISTANT]` 的发言）仅用于理解上下文、记住用户的偏好和维持对话连贯性，而不是用来重复过去的动作。",
   "log": {
     "path": "../logs/",
     "file": "server.log",
@@ -27,6 +27,46 @@
     "password": "example",
     "db": 0,
     "key_prefix": "xiaozhi"
+  },
+  "memory": {
+    "enabled": "true",
+    "type": "none",
+    "short_term": {
+      "enabled": true,
+      "provider": "redis",
+      "max_messages": 50,
+      "ttl_seconds": 604800,
+      "compression_enabled": false,
+      "redis": {
+        "host": "127.0.0.1",
+        "port": 6379,
+        "password": "example",
+        "db": 0,
+        "key_prefix": "xiaozhi:memory"
+      }
+    },
+    "long_term": {
+      "enabled": true,
+      "provider": "memobase",
+      "batch_size": 10,
+      "flush_interval_seconds": 5,
+      "providers": {
+        "memobase": {
+          "project_url": "http://127.0.0.1:8777",
+          "api_key": "example",
+          "timeout_seconds": 30,
+          "health_check_interval_seconds": 60
+        },
+        "null": {
+          "enabled": false
+        }
+      }
+    },
+    "hybrid": {
+      "strategy": "parallel",
+      "short_term_priority": true,
+      "long_term_context_max_tokens": 4000
+    }
   },
   "websocket": {
     "host": "0.0.0.0",
@@ -64,7 +104,7 @@
     "listen_port": 8990
   },
   "vad": {
-    "provider": "webrtc_vad",
+    "provider": "silero_vad",
     "webrtc_vad": {
       "pool_min_size": 5,
       "pool_max_size": 1000,
@@ -94,6 +134,25 @@
       "max_connections": 5,
       "timeout": 30,
       "auto_end": true
+    },
+    "doubao": {
+      "appid": "xxx",
+      "access_token": "xxx-Cu",
+      "host": "openspeech.bytedance.com",
+      "ws_url": "wss://openspeech.bytedance.com/api/v3/sauc/bigmodel_nostream",
+      "model_name": "bigmodel",
+      "end_window_size": 800,
+      "enable_punc": true,
+      "enable_itn": true,
+      "enable_ddc": false,
+      "timeout": 30
+    },
+    "aliyun": {
+      "access_key_id": "your_access_key_id",
+      "access_key_secret": "your_access_key_secret",
+      "appkey": "your_appkey",
+      "host": "nls-gateway-cn-shanghai.aliyuncs.com",
+      "max_sentence_silence": 800
     }
   },
   "tts": {
@@ -247,15 +306,7 @@
       "url": "https://freetyst.nf.migu.cn/public%2Fproduct9th%2Fproduct46%2F2024%2F08%2F2317%2F2016%E5%B9%B401%E6%9C%8820%E6%97%A511%E7%82%B929%E5%88%86%E5%86%85%E5%AE%B9%E5%87%86%E5%85%A5%E6%AD%A3%E4%B8%9C537%E9%A6%96%2F%E5%85%A8%E6%9B%B2%E8%AF%95%E5%90%AC%2FMp3_64_22_16%2F6005660FVS8174331.mp3?Key=d3b04946ff6297ec&Tim=1753430018842&channelid=01&msisdn=06c3638197af48a98d0c7d91200c8279"
     }
   },
-  "long_term_memory": {
-    "enabled": true,
-    "provider": "memobase"
-  },
-  "memobase": {
-    "enabled": true,
-    "project_url": "http://127.0.0.1:8777",
-    "api_key": "example"
-  },
+
   "ota": {
     "signature_key": "your_ota_signature_key_here",
     "test": {
