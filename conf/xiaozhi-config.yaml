@@ -68,7 +68,7 @@ memory:
     flush_interval_seconds: 5         # 刷新间隔（秒）
     providers:
       memobase:
-        project_url: "http://127.0.0.1:8777"           # 项目URL
+        project_url: "http://host.docker.internal:8777"           # 项目URL
         api_key: "example"                               # API密钥
         timeout_seconds: 30                              # 超时时间（秒）
         health_check_interval_seconds: 60                # 健康检查间隔（秒）

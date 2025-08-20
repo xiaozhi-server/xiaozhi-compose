@@ -3,7 +3,7 @@
 export DOCKER_DEFAULT_PLATFORM=linux/amd64
 
 # 默认 compose 文件
-COMPOSE_FILE="docker-compose.yaml"
+COMPOSE_FILE="docker-compose-all.yaml"
 
 # 解析 -f 或 --file 参数
 while [[ $# -gt 0 ]]; do
