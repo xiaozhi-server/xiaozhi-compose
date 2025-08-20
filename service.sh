@@ -1,34 +1,75 @@
 #!/bin/bash
 
 export DOCKER_DEFAULT_PLATFORM=linux/amd64
+
+# 默认 compose 文件
+COMPOSE_FILE="docker-compose.yaml"
+
+# 解析 -f 或 --file 参数
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -f|--file)
+      COMPOSE_FILE="$2"
+      shift 2
+      ;;
+    start|stop|restart|status|logs|stopXiaozhi|startXiaozhi|help)
+      CMD=$1
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+  # break if both COMPOSE_FILE and CMD are set
+  if [[ -n "$COMPOSE_FILE" && -n "$CMD" ]]; then
+    break
+  fi
+  # break if only CMD is set and no -f
+  if [[ -z "$COMPOSE_FILE" && -n "$CMD" ]]; then
+    break
+  fi
+  # break if only COMPOSE_FILE is set and no CMD
+  if [[ -n "$COMPOSE_FILE" && -z "$CMD" ]]; then
+    break
+  fi
+  # else continue
+  continue
+  done
+
+# 检查 .env 文件是否存在，不存在则从 env.example 复制并提醒用户
+if [ ! -f .env ]; then
+  cp env.example .env
+  echo ".env file not found. Copied env.example to .env. Please review and modify .env as needed."
+fi
+
 function start() {
   # 启动 docker-compose
-  docker-compose up -d
-  echo "Starting..."
+  docker-compose -f "$COMPOSE_FILE" up -d
+  echo "Starting with $COMPOSE_FILE..."
 }
 
 function stop() {
   # 停止 docker-compose
-  docker-compose down
-  echo "Stopping..."
+  docker-compose -f "$COMPOSE_FILE" down
+  echo "Stopping with $COMPOSE_FILE..."
 }
 
 function restart() {
   stop
   start
-  echo "Restarting..."
+  echo "Restarting with $COMPOSE_FILE..."
 }
 
 function status() {
   # 查看 docker-compose 状态
-  docker-compose ps
-  echo "Status..."
+  docker-compose -f "$COMPOSE_FILE" ps
+  echo "Status with $COMPOSE_FILE..."
 }
 
 function logs() {
   # 查看 docker-compose 日志
-  docker-compose logs -f
-  echo "Logs..."
+  docker-compose -f "$COMPOSE_FILE" logs -f
+  echo "Logs with $COMPOSE_FILE..."
 }
 
 function stopXiaozhi() {
@@ -44,17 +85,18 @@ function startXiaozhi() {
 }
 
 function help() {
-  echo "Usage: $0 {start|stop|restart|status|logs}"
-  echo "start    - Start the service"
-  echo "stop     - Stop the service"
-  echo "restart  - Restart the service"
-  echo "status   - Check the service status"
-  echo "logs     - View the service logs"
-  echo "stopXiaozhi - Stop the xiaozhi-backend-go-server service"
+  echo "Usage: $0 [-f compose-file] {start|stop|restart|status|logs}"
+  echo "  -f, --file   Specify docker compose file (default: docker-compose.yaml)"
+  echo "start        - Start the service"
+  echo "stop         - Stop the service"
+  echo "restart      - Restart the service"
+  echo "status       - Check the service status"
+  echo "logs         - View the service logs"
+  echo "stopXiaozhi  - Stop the xiaozhi-backend-go-server service"
   echo "startXiaozhi - Start the xiaozhi-backend-go-server service"
 }
 
-case $1 in
+case $CMD in
   start)
     start
     ;;

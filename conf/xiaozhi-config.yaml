@@ -215,6 +215,7 @@ tts:
     client_id: "e4b0c442-98fc-4e1b-8c3d-6a5b6a5b6a6d"  # 客户端ID
     token: "test-token"                                 # 访问令牌
 
+
 # 大语言模型（LLM）配置
 llm:
   provider: "local"  # 默认使用的LLM提供商
@@ -278,7 +279,7 @@ default_modules:
 # 管理API配置
 manager_api:
   enabled: true                              # 是否启用管理API
-  base_url: "http://127.0.0.1:8002/xiaozhi" # API基础地址
+  base_url: "http://xiaozhi-server-dashboard:8002/xiaozhi,http://127.0.0.1:8002/xiaozhi" # API基础地址
   secret: "cc36d3ca-b065-47ef-ae29-d34f7540abd1"  # 密钥
   timeout_seconds: 30                        # 超时时间（秒）
   retry_attempts: 3                          # 重试次数
