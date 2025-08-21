@@ -53,6 +53,7 @@ services:
     environment:
       - WS_URL=ws://host.docker.internal:8989/xiaozhi/v1/
       - DEVICE_TOKEN=test
+      - DEVICE_MAC=ba:8f:17:de:94:94
     restart: always
   # 数据库模块
   xiaozhi-server-db:
