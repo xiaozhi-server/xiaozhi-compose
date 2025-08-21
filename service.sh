@@ -2,6 +2,21 @@
 
 export DOCKER_DEFAULT_PLATFORM=linux/amd64
 
+# 检测应该使用哪个 docker compose 命令
+function detect_docker_compose() {
+  if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker-compose"
+  elif command -v docker &> /dev/null && docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+  else
+    echo "Error: Neither docker-compose nor docker compose is installed."
+    exit 1
+  fi
+}
+
+# 调用函数设置正确的命令
+detect_docker_compose
+
 # 默认 compose 文件
 COMPOSE_FILE="docker-compose-all.yaml"
 
@@ -44,13 +59,13 @@ fi
 
 function start() {
   # 启动 docker-compose
-  docker-compose -f "$COMPOSE_FILE" up -d
+  $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" up -d
   echo "Starting with $COMPOSE_FILE..."
 }
 
 function stop() {
   # 停止 docker-compose
-  docker-compose -f "$COMPOSE_FILE" down
+  $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" down
   echo "Stopping with $COMPOSE_FILE..."
 }
 
@@ -62,13 +77,13 @@ function restart() {
 
 function status() {
   # 查看 docker-compose 状态
-  docker-compose -f "$COMPOSE_FILE" ps
+  $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" ps
   echo "Status with $COMPOSE_FILE..."
 }
 
 function logs() {
   # 查看 docker-compose 日志
-  docker-compose -f "$COMPOSE_FILE" logs -f
+  $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" logs -f
   echo "Logs with $COMPOSE_FILE..."
 }
 
