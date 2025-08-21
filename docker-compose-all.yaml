@@ -1,8 +1,9 @@
 services:
   xiaozhi-backend-go-server:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250821
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250822
     container_name: xiaozhi-backend-go-server
     restart:  always
+    pull_policy: always
     volumes:
       - ./conf/xiaozhi-config.yaml:/workspace/config/config.yaml
     env_file:
@@ -11,6 +12,12 @@ services:
       - xiaozhi-network
     ports:
       - "8989:8989" # 请根据实际后端服务端口调整
+    extra_hosts:
+      # 将宿主机的IP地址（通过host-gateway获取）映射给 localhost
+      # 这会覆盖容器内默认的 /etc/hosts 中 xiaozhi.localhost -> 127.0.0.1 的条目
+      - "xiaozhi.localhost:host-gateway"
+      - "host.docker.internal:host-gateway" # 建议同时保留标准条目
+
   # manager-api和manager-web模块
   xiaozhi-server-dashboard:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:xiaozhi-dashboard
@@ -55,30 +62,6 @@ services:
       - DEVICE_TOKEN=test
       - DEVICE_MAC=ba:8f:17:de:94:94
     restart: always
-  memobase-server-db:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:pgvector17
-    #image: pgvector/pgvector:pg17
-    restart: unless-stopped
-    container_name: memobase-server-db
-    env_file:
-      - .env
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    platform: linux/amd64
- #   ports:
- #     - '15432:5432'
-    networks:
-      - xiaozhi-network
-    volumes:
-      - ./pgvector_data:/var/lib/postgresql/data
-      # - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U example -d example"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
   # 数据库模块
   xiaozhi-server-db:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:mysql
@@ -147,6 +130,30 @@ services:
         condition: service_healthy
     volumes:
       - ./conf/memobase-config.yaml:/app/config.yaml
+  memobase-server-db:
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:pgvector17
+    #image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    container_name: memobase-server-db
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    platform: linux/amd64
+    #   ports:
+    #     - '15432:5432'
+    networks:
+      - xiaozhi-network
+    volumes:
+      - ./pgvector_data:/var/lib/postgresql/data
+      # - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U example -d example"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   xiaozhi-navidrome:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:navidrome
     #image: deluan/navidrome:0.58.0
@@ -157,7 +164,7 @@ services:
     networks:
       - xiaozhi-network
     ports:
-      - "14533:4533"
+      - "8555:4533"
     volumes:
       - ./navidrome_data:/data:rw
       - ./music:/music:ro
@@ -175,8 +182,8 @@ services:
       - .env
     networks:
       - xiaozhi-network
-    ports:
-      - "17000:17000"
+   # ports:
+   #   - "17000:17000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL}

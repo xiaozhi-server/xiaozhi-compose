@@ -86,7 +86,7 @@ if "%CMD%"=="help" goto do_help
 goto do_help
 
 do_start:
-    docker-compose -f %COMPOSE_FILE% up -d
+    docker-compose -f %COMPOSE_FILE% up --pull always -d
     echo Starting with %COMPOSE_FILE%...
     goto :eof
 

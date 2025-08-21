@@ -37,7 +37,7 @@ log:
 
 # Redis数据库配置，用于存储设备配置及聊天历史记录，可选
 redis:
-  host: "127.0.0.1"      # Redis服务器地址
+  host: "xiaozhi.localhost"      # Redis服务器地址
   port: 6379             # Redis端口
   password: "example"    # Redis密码
   db: 0                  # 使用的数据库编号
@@ -55,8 +55,8 @@ memory:
     ttl_seconds: 604800              # 生存时间（秒）
     compression_enabled: false       # 是否启用压缩
     redis:
-      host: "127.0.0.1"              # Redis服务器地址
-      port: 6379                     # Redis端口
+      host: "xiaozhi.localhost"      # Redis服务器地址
+      port: 16379                     # Redis端口
       password: "example"            # Redis密码
       db: 0                          # 使用的数据库编号
       key_prefix: "xiaozhi:memory"   # 键名前缀
@@ -68,7 +68,7 @@ memory:
     flush_interval_seconds: 5         # 刷新间隔（秒）
     providers:
       memobase:
-        project_url: "http://127.0.0.1:8777"           # 项目URL
+        project_url: "http://xiaozhi.localhost:8777"           # 项目URL
         api_key: "example"                               # API密钥
         timeout_seconds: 30                              # 超时时间（秒）
         health_check_interval_seconds: 60                # 健康检查间隔（秒）
@@ -203,7 +203,7 @@ tts:
     receive_timeout: 60            # 接收超时（秒）
   # Edge离线TTS配置
   edge_offline:
-    server_url: "ws://localhost:8080/tts"  # 服务器地址
+    server_url: "ws://xiaozhi.localhost:8080/tts"  # 服务器地址
     timeout: 30                            # 超时时间（秒）
     sample_rate: 16000                     # 采样率
     channels: 1                            # 声道数
@@ -224,7 +224,7 @@ llm:
     type: "openai"                                      # 接口类型
     model_name: "qwen2.5-72b-instruct"                # 模型名称
     api_key: "api_key"                                 # API密钥
-    base_url: "http://localhost:17000/default/openai/v1"  # API基础地址
+    base_url: "http://xiaozhi.localhost:17000/default/openai/v1"  # API基础地址
     max_tokens: 500                                    # 最大生成token数
   # DeepSeek V3模型配置（硅基流动平台）
   deepseek:
@@ -379,7 +379,7 @@ music:
   provider: "subsonic"  # 音乐提供商
   # Subsonic音乐服务器配置
   subsonic:
-    base_url: "http://localhost:14533"  # 服务器地址
+    base_url: "http://xiaozhi.localhost:8555"  # 服务器地址
     username: "admin"                  # 用户名
     password: "admin"                  # 密码
   # 测试音乐配置

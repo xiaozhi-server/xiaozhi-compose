@@ -59,6 +59,7 @@ fi
 
 function start() {
   # 启动 docker-compose
+  # $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" pull
   $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" up -d
   echo "Starting with $COMPOSE_FILE..."
 }
