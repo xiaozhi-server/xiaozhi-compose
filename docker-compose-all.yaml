@@ -147,10 +147,10 @@ services:
         condition: service_healthy
     volumes:
       - ./conf/memobase-config.yaml:/app/config.yaml
-  navidrome:
+  xiaozhi-navidrome:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:navidrome
     #image: deluan/navidrome:0.58.0
-    container_name: navidrome
+    container_name: xiaozhi-navidrome
     restart: always
     env_file:
       - .env
