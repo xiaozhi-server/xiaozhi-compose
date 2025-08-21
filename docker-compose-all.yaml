@@ -157,7 +157,7 @@ services:
     networks:
       - xiaozhi-network
     ports:
-      - "4533:4533"
+      - "14533:4533"
     volumes:
       - ./navidrome_data:/data:rw
       - ./music:/music:ro

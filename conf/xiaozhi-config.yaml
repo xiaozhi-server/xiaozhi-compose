@@ -379,7 +379,7 @@ music:
   provider: "subsonic"  # 音乐提供商
   # Subsonic音乐服务器配置
   subsonic:
-    base_url: "http://localhost:4533"  # 服务器地址
+    base_url: "http://localhost:14533"  # 服务器地址
     username: "admin"                  # 用户名
     password: "admin"                  # 密码
   # 测试音乐配置

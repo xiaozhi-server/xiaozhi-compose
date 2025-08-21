@@ -95,40 +95,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  navidrome:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:navidrome
-    #image: deluan/navidrome:0.58.0
-    container_name: navidrome
-    restart: always
-    env_file:
-      - .env
-    networks:
-      - xiaozhi-network
-    ports:
-      - "4533:4533"
-    volumes:
-      - ./navidrome_data:/data:rw
-      - ./music:/music:ro
-    environment:
-      - ND_SCANSCHEDULE=1h
-      - ND_LOGLEVEL=info
-      - ND_SESSIONTIMEOUT=24h
-      - ND_BASEURL=
-    labels:
-      createdBy: "Apps"
-  aiproxy:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:aiproxy
-    container_name: aiproxy
-    env_file:
-      - .env
-    networks:
-      - xiaozhi-network
-    ports:
-      - "17000:17000"
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
-    restart: always
 networks:
   xiaozhi-network:
     driver: bridge
