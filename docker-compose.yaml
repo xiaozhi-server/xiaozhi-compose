@@ -1,6 +1,6 @@
 services:
   xiaozhi-backend-go-server:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250822
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250823
     container_name: xiaozhi-backend-go-server
     restart:  always
     pull_policy:  always
@@ -44,23 +44,6 @@ services:
     volumes:
       # 配置文件目录
       - ./uploadfile:/uploadfile
-  xiaozhi-web-client:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:web-client
-    container_name: xiaozhi-web-client
-    networks:
-      - xiaozhi-network
-    ports:
-      - "5001:5001"
-      - "5002:5002"
-    env_file:
-      - .env
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    environment:
-      - WS_URL=ws://host.docker.internal:8989/xiaozhi/v1/
-      - DEVICE_TOKEN=test
-      - DEVICE_MAC=ba:8f:17:de:94:94
-    restart: always
   # 数据库模块
   xiaozhi-server-db:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:mysql

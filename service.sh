@@ -18,13 +18,14 @@ function detect_docker_compose() {
 detect_docker_compose
 
 # 默认 compose 文件
-COMPOSE_FILE="docker-compose-all.yaml"
+COMPOSE_FILES=("docker-compose.yaml")
 
 # 解析 -f 或 --file 参数
 while [[ $# -gt 0 ]]; do
   case $1 in
     -f|--file)
-      COMPOSE_FILE="$2"
+      COMPOSE_FILES+=("$2")
+      echo "Using compose file: $COMPOSE_FILES"
       shift 2
       ;;
     start|stop|restart|status|logs|stopXiaozhi|startXiaozhi|help)
@@ -35,21 +36,27 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
   esac
-  # break if both COMPOSE_FILE and CMD are set
-  if [[ -n "$COMPOSE_FILE" && -n "$CMD" ]]; then
+  # break if both COMPOSE_FILES and CMD are set
+  if [[ ${#COMPOSE_FILES[@]} -ne 0 && -n "$CMD" ]]; then
     break
   fi
   # break if only CMD is set and no -f
-  if [[ -z "$COMPOSE_FILE" && -n "$CMD" ]]; then
+  if [[ ${#COMPOSE_FILES[@]} -eq 0 && -n "$CMD" ]]; then
     break
   fi
-  # break if only COMPOSE_FILE is set and no CMD
-  if [[ -n "$COMPOSE_FILE" && -z "$CMD" ]]; then
+  # break if only COMPOSE_FILES is set and no CMD
+  if [[ ${#COMPOSE_FILES[@]} -ne 0 && -z "$CMD" ]]; then
     break
   fi
   # else continue
   continue
-  done
+done
+
+# 组装 compose file 参数
+COMPOSE_FILE_ARGS=""
+for f in "${COMPOSE_FILES[@]}"; do
+  COMPOSE_FILE_ARGS+=" -f $f"
+done
 
 # 检查 .env 文件是否存在，不存在则从 env.example 复制并提醒用户
 if [ ! -f .env ]; then
@@ -60,32 +67,32 @@ fi
 function start() {
   # 启动 docker-compose
   # $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" pull
-  $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" up -d
-  echo "Starting with $COMPOSE_FILE..."
+  $DOCKER_COMPOSE_CMD $COMPOSE_FILE_ARGS up -d
+  echo "Starting with ${COMPOSE_FILES[*]}..."
 }
 
 function stop() {
   # 停止 docker-compose
-  $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" down
-  echo "Stopping with $COMPOSE_FILE..."
+  $DOCKER_COMPOSE_CMD $COMPOSE_FILE_ARGS down
+  echo "Stopping with ${COMPOSE_FILES[*]}..."
 }
 
 function restart() {
   stop
   start
-  echo "Restarting with $COMPOSE_FILE..."
+  echo "Restarting with ${COMPOSE_FILES[*]}..."
 }
 
 function status() {
   # 查看 docker-compose 状态
-  $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" ps
-  echo "Status with $COMPOSE_FILE..."
+  $DOCKER_COMPOSE_CMD $COMPOSE_FILE_ARGS ps
+  echo "Status with ${COMPOSE_FILES[*]}..."
 }
 
 function logs() {
   # 查看 docker-compose 日志
-  $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" logs -f
-  echo "Logs with $COMPOSE_FILE..."
+  $DOCKER_COMPOSE_CMD $COMPOSE_FILE_ARGS logs -f
+  echo "Logs with ${COMPOSE_FILES[*]}..."
 }
 
 function stopXiaozhi() {

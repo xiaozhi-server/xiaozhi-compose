@@ -1,0 +1,15 @@
+services:
+  xiaozhi-web-client:
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:web-client
+    container_name: xiaozhi-web-client
+    network_mode: host
+    #ports:
+    #  - "5001:5001"
+    #  - "5002:5002"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - WS_URL=ws://localhost:8000
+      - DEVICE_TOKEN=test
+      - DEVICE_MAC=ba:8f:17:de:94:94
+    restart: always
