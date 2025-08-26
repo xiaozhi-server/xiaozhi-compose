@@ -23,8 +23,6 @@ services:
     depends_on:
       memobase-server-db:
         condition: service_healthy
-      xiaozhi-server-redis:
-        condition: service_healthy
     volumes:
       - ./conf/memobase-config.yaml:/app/config.yaml
   memobase-server-db:
