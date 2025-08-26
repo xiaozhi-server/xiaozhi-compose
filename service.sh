@@ -44,10 +44,7 @@ while [[ $# -gt 0 ]]; do
   if [[ ${#COMPOSE_FILES[@]} -eq 0 && -n "$CMD" ]]; then
     break
   fi
-  # break if only COMPOSE_FILES is set and no CMD
-  if [[ ${#COMPOSE_FILES[@]} -ne 0 && -z "$CMD" ]]; then
-    break
-  fi
+
   # else continue
   continue
 done
