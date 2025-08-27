@@ -66,7 +66,7 @@ services:
       - MYSQL_DATABASE=xiaozhi_esp32_server
       - MYSQL_INITDB_ARGS="--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
   xiaozhi-server-redis:
-    image: redis:7.4
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:redis7.4
     restart: unless-stopped
     container_name: xiaozhi-server-redis
     env_file:
