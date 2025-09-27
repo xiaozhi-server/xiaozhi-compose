@@ -1,11 +1,12 @@
 services:
   xiaozhi-backend-go-server:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250826
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250920
     container_name: xiaozhi-backend-go-server
     restart:  always
     pull_policy:  always
+    working_dir: /apps/backend-server
     volumes:
-      - ./conf/xiaozhi-config.yaml:/workspace/config/config.yaml
+      - ./conf/xiaozhi-config.yaml:/apps/backend-server/config.yaml
     env_file:
       - .env
     networks:
@@ -15,9 +16,39 @@ services:
     extra_hosts:
       # 将宿主机的IP地址（通过host-gateway获取）映射给 localhost
       # 这会覆盖容器内默认的 /etc/hosts 中 xiaozhi.localhost -> 127.0.0.1 的条目
+      - "example.localhost:host-gateway"
       - "xiaozhi.localhost:host-gateway"
       - "host.docker.internal:host-gateway" # 建议同时保留标准条目
+    command:
+      - "/apps/backend-server/server"
+      - "--config=/apps/backend-server/config.yaml"
   # manager-api和manager-web模块
+  xiaozhi-go-dashboard:
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250920
+    container_name: xiaozhi-go-dashboard
+    restart: always
+    #network_mode:  host
+    working_dir: /apps/manager-server
+    networks:
+      - xiaozhi-network
+    platform: linux/amd64
+    depends_on:
+      xiaozhi-server-db:
+        condition: service_healthy
+      xiaozhi-server-redis:
+        condition: service_healthy
+    ports:
+      - "8003:8003"
+    environment:
+      - TZ=Asia/Shanghai
+    extra_hosts:
+      # 将宿主机的IP地址（通过host-gateway获取）映射给 localhost
+      # 这会覆盖容器内默认的 /etc/hosts 中 xiaozhi.localhost -> 127.0.0.1 的条目
+      - "example.localhost:host-gateway"
+      - "host.docker.internal:host-gateway" # 建议同时保留标准条目
+    command:
+      - "/apps/manager-server/server"
+      - "--config=/apps/manager-server/config.yaml"
   xiaozhi-server-dashboard:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:xiaozhi-dashboard
     container_name: xiaozhi-server-dashboard
@@ -55,6 +86,8 @@ services:
       interval: 10s
       retries: 10
     restart: always
+    ports:
+      - "3306:3306"
     networks:
       - xiaozhi-network
     platform: linux/amd64

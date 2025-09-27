@@ -7,9 +7,10 @@ services:
     #  - "5001:5001"
     #  - "5002:5002"
     extra_hosts:
+      - "example.localhost:host-gateway"
       - "host.docker.internal:host-gateway"
     environment:
-      - WS_URL=ws://localhost:8000
+      - WS_URL=ws://example.localhost:8989/xiaozhi/v1/
       - DEVICE_TOKEN=test
       - DEVICE_MAC=ba:8f:17:de:94:94
     restart: always

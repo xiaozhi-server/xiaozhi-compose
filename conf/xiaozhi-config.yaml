@@ -38,7 +38,7 @@ log:
 # Redis数据库配置，用于存储设备配置及聊天历史记录，可选
 redis:
   host: "xiaozhi.localhost"      # Redis服务器地址
-  port: 6379             # Redis端口
+  port: 16379             # Redis端口
   password: "example"    # Redis密码
   db: 0                  # 使用的数据库编号
   key_prefix: "xiaozhi"  # 键名前缀
@@ -279,7 +279,7 @@ default_modules:
 # 管理API配置
 manager_api:
   enabled: true                              # 是否启用管理API
-  base_url: "http://xiaozhi-server-dashboard:8002/xiaozhi,http://127.0.0.1:8002/xiaozhi" # API基础地址
+  base_url: "http://example.localhost:8003/xiaozhi,http://xiaozhi-server-dashboard:8002/xiaozhi" # API基础地址
   secret: "cc36d3ca-b065-47ef-ae29-d34f7540abd1"  # 密钥
   timeout_seconds: 30                        # 超时时间（秒）
   retry_attempts: 3                          # 重试次数
@@ -364,9 +364,9 @@ enable_greeting: true
 
 # 欢迎语列表（随机选择）
 greeting_list:
-  - "你好，我是小智，很高兴认识你。"
-  - "你好，我是小智，今天有啥好玩的。"
-  - "你好，我是小智，有什么需要帮助的。"
+  - "你好呀，你今天心情怎么样。"
+  - "你好，今天有啥好玩的。"
+  - "你好，有什么需要帮助的。"
 
 # 唤醒词列表
 wakeup_words:
