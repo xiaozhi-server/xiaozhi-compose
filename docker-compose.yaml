@@ -1,6 +1,6 @@
 services:
   xiaozhi-backend-go-server:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250920
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20251002
     container_name: xiaozhi-backend-go-server
     restart:  always
     pull_policy:  always
@@ -24,7 +24,7 @@ services:
       - "--config=/apps/backend-server/config.yaml"
   # manager-api和manager-web模块
   xiaozhi-go-dashboard:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20250920
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20251002
     container_name: xiaozhi-go-dashboard
     restart: always
     #network_mode:  host
