@@ -11,7 +11,7 @@ auth:
 
 # 聊天配置
 chat:
-  max_idle_duration: 30000         # 最大空闲时间（毫秒）
+  max_idle_duration: 0         # 最大空闲时间（毫秒）
   chat_max_silence_duration: 200   # 由 有声音 转到 静音的阈值时间，决定响应快慢 （毫秒）
 
 # 系统提示词，定义AI助手的角色和行为
