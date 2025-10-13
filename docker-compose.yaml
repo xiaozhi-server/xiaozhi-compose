@@ -32,6 +32,7 @@ services:
       #image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20251002
     container_name: xiaozhi-manager-server
     restart: always
+    pull_policy:  always
     #network_mode:  host
     working_dir: /apps/manager-server
     networks:

@@ -7,10 +7,10 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
-      - ACCESS_TOKEN=${ACCESS_TOKEN}
-      - PROJECT_ID=${PROJECT_ID}
+      - DATABASE_URL=postgresql://example:example@xiaozhi-server-db:5432/example
+      - REDIS_URL=redis://:example@xiaozhi-server-redis:6379/0
+      - ACCESS_TOKEN=example
+      - PROJECT_ID=example
       - API_EXPORT_PORT=${API_EXPORT_PORT}
       - API_HOSTS=${API_HOSTS}
       - USE_CORS=${USE_CORS}
