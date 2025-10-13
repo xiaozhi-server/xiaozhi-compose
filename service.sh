@@ -94,13 +94,13 @@ function logs() {
 
 function stopXiaozhi() {
   # 停止 docker-compose
-  docker stop xiaozhi-backend-go-server
-  echo "Stopping xiaozhi-backend-go-server..."
+  docker stop xiaozhi-backend-server xiaozhi-manager-server
+  echo "Stopping xiaozhi-server..."
 }
 
 function startXiaozhi() {
   # 启动 docker-compose
-  docker start xiaozhi-backend-go-server
+  docker start xiaozhi-backend-go-server xiaozhi-manager-server
   echo "Starting xiaozhi-backend-go-server..."
 }
 
