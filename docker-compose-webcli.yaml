@@ -2,15 +2,15 @@ services:
   xiaozhi-web-client:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:web-client
     container_name: xiaozhi-web-client
+    pull_policy: always
     network_mode: host
-    #ports:
-    #  - "5001:5001"
-    #  - "5002:5002"
+    env_file:
+      - .env
     extra_hosts:
       - "example.localhost:host-gateway"
       - "host.docker.internal:host-gateway"
     environment:
-      - WS_URL=ws://example.localhost:8989/xiaozhi/v1/
-      - DEVICE_TOKEN=test
-      - DEVICE_MAC=ba:8f:17:de:94:94
+      - WS_URL=${WEBCLI_WS_URL:-ws://example.localhost:8007/xiaozhi/v1/}
+      - DEVICE_TOKEN=${WEBCLI_DEVICE_TOKEN:-test}
+      - DEVICE_MAC=${WEBCLI_DEVICE_MAC:-ba:8f:17:de:94:94}
     restart: always
