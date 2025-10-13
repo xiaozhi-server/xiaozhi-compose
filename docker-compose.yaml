@@ -1,12 +1,11 @@
 services:
-  xiaozhi-backend-go-server:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20251002
-    container_name: xiaozhi-backend-go-server
+  xiaozhi-backend-server:
+    image: ghcr.io/xiaozhi-labs/xiaozhi-server:dev
+    #image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20251002
+    container_name: xiaozhi-backend-server
     restart:  always
     pull_policy:  always
     working_dir: /apps/backend-server
-    volumes:
-      - ./conf/xiaozhi-config.yaml:/apps/backend-server/config.yaml
     env_file:
       - .env
     environment:
@@ -15,17 +14,23 @@ services:
     networks:
       - xiaozhi-network
     ports:
-      - "8989:8989" # 请根据实际后端服务端口调整
+      - "8007:8007" # 请根据实际后端服务端口调整
     extra_hosts:
       # 将宿主机的IP地址（通过host-gateway获取）映射给 localhost
       # 这会覆盖容器内默认的 /etc/hosts 中 xiaozhi.localhost -> 127.0.0.1 的条目
       - "example.localhost:host-gateway"
-      - "xiaozhi.localhost:host-gateway"
       - "host.docker.internal:host-gateway" # 建议同时保留标准条目
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
   # manager-api和manager-web模块
-  xiaozhi-go-dashboard:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20251002
-    container_name: xiaozhi-go-dashboard
+  xiaozhi-manager-server:
+    image: ghcr.io/xiaozhi-labs/xiaozhi-server:dev 
+      #image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:backend-go-server-20251002
+    container_name: xiaozhi-manager-server
     restart: always
     #network_mode:  host
     working_dir: /apps/manager-server
@@ -38,64 +43,43 @@ services:
       xiaozhi-server-redis:
         condition: service_healthy
     ports:
-      - "8003:8003"
+      - "8002:8002"
     environment:
       - TZ=Asia/Shanghai
       - RUN_MODE=manager
     extra_hosts:
-      # 将宿主机的IP地址（通过host-gateway获取）映射给 localhost
-      # 这会覆盖容器内默认的 /etc/hosts 中 xiaozhi.localhost -> 127.0.0.1 的条目
       - "example.localhost:host-gateway"
       - "host.docker.internal:host-gateway" # 建议同时保留标准条目
-  xiaozhi-server-dashboard:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:xiaozhi-dashboard
-    container_name: xiaozhi-server-dashboard
-    restart: always
-    #network_mode:  host
-    networks:
-      - xiaozhi-network
-    platform: linux/amd64
-    depends_on:
-      xiaozhi-server-db:
-        condition: service_healthy
-      xiaozhi-server-redis:
-        condition: service_healthy
-    ports:
-      - "8002:8002"
-    environment:
-      - TZ=Asia/Shanghai
-      - SPRING_DATASOURCE_DRUID_URL=jdbc:mysql://xiaozhi-server-db:3306/xiaozhi_esp32_server?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&connectTimeout=30000&socketTimeout=30000&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
-      - SPRING_DATASOURCE_DRUID_USERNAME=root
-      - SPRING_DATASOURCE_DRUID_PASSWORD=123456
-      - SPRING_DATA_REDIS_HOST=xiaozhi-server-redis
-      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
-      - SPRING_DATA_REDIS_PORT=6379
-    volumes:
-      # 配置文件目录
-      - ./uploadfile:/uploadfile
-  # 数据库模块
-  xiaozhi-server-db:
-    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:mysql
-    #image: mysql:latest
-    container_name: xiaozhi-server-db
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
-      timeout: 45s
-      interval: 10s
-      retries: 10
-    restart: always
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  xiaozhi-server-db:
+    image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:pgvector17
+    #image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    container_name: xiaozhi-server-db
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    platform: linux/amd64
     ports:
-      - "3306:3306"
+      - '15432:5432'
     networks:
       - xiaozhi-network
-    platform: linux/amd64
     volumes:
-      - ./mysql/data:/var/lib/mysql
-    environment:
-      - TZ=Asia/Shanghai
-      - MYSQL_ROOT_PASSWORD=123456
-      - MYSQL_DATABASE=xiaozhi_esp32_server
-      - MYSQL_INITDB_ARGS="--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+      - ./pgvector_data:/var/lib/postgresql/data
+      # - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U example -d example"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   xiaozhi-server-redis:
     image: registry.cn-shanghai.aliyuncs.com/dapp/xiaozhi:redis7.4
     restart: unless-stopped
