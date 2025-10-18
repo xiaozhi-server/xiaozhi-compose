@@ -66,7 +66,6 @@ services:
       - .env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_INITDB_ARGS="--no-sync --auth-trust"
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     platform: linux/amd64
