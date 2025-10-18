@@ -14,14 +14,14 @@ services:
     networks:
       - xiaozhi-network
     ports:
-      - "8007:8007" # 请根据实际后端服务端口调整
+      - "8002:8002" # 请根据实际后端服务端口调整
     extra_hosts:
       # 将宿主机的IP地址（通过host-gateway获取）映射给 localhost
       # 这会覆盖容器内默认的 /etc/hosts 中 xiaozhi.localhost -> 127.0.0.1 的条目
       - "example.localhost:host-gateway"
       - "host.docker.internal:host-gateway" # 建议同时保留标准条目
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -44,7 +44,7 @@ services:
       xiaozhi-server-redis:
         condition: service_healthy
     ports:
-      - "8002:8002"
+      - "8007:8007"
     environment:
       - TZ=Asia/Shanghai
       - RUN_MODE=manager
@@ -52,7 +52,7 @@ services:
       - "example.localhost:host-gateway"
       - "host.docker.internal:host-gateway" # 建议同时保留标准条目
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
       interval: 30s
       timeout: 10s
       retries: 3
