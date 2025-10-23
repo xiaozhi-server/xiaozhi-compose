@@ -48,6 +48,8 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - RUN_MODE=manager
+    volumes:
+      - ./managerdb:/apps/db
     extra_hosts:
       - "example.localhost:host-gateway"
       - "host.docker.internal:host-gateway" # 建议同时保留标准条目
