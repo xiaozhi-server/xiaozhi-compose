@@ -48,6 +48,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - RUN_MODE=manager
+      - DNS=sqlite:///apps/db/manager-server.db?_pragma=journal_mode(WAL)&_pragma=synchronous(NORMAL)
     volumes:
       - ./data/managerdb:/apps/db
     extra_hosts:
